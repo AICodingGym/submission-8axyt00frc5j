@@ -1922,10 +1922,23 @@ def test_where() -> None:
     assert_identical(expected, actual)
 
 
-def test_where_keep_attrs() -> None:
-    cond = xr.DataArray([True, False], dims="x", attrs={"foo": "bar"})
-    actual = xr.where(cond, 1, 0)
-    expected = xr.DataArray([1, 0], dims="x", attrs={"foo": "bar"})
+def test_where_attrs() -> None:
+    cond = xr.DataArray([True, False], dims="x", attrs={"attr": "cond"})
+    x = xr.DataArray([1, 1], dims="x", attrs={"attr": "x"})
+    y = xr.DataArray([0, 0], dims="x", attrs={"attr": "y"})
+    actual = xr.where(cond, x, y, keep_attrs=True)
+    expected = xr.DataArray([1, 0], dims="x", attrs={"attr": "x"})
+    assert_identical(expected, actual)
+
+    # scalar x: no attrs to keep
+    actual = xr.where(cond, 1, y, keep_attrs=True)
+    expected = xr.DataArray([1, 0], dims="x")
+    assert_identical(expected, actual)
+
+    # option set globally
+    with xr.set_options(keep_attrs=True):
+        actual = xr.where(cond, x, y)
+    expected = xr.DataArray([1, 0], dims="x", attrs={"attr": "x"})
     assert_identical(expected, actual)
 
 

@@ -1809,7 +1809,7 @@ def where(cond, x, y):
         equivalent methods
     """
     # alignment for three arguments is complicated, so don't support it yet
-    return apply_ufunc(
+    result = apply_ufunc(
         duck_array_ops.where,
         cond,
         x,
@@ -1817,7 +1817,16 @@ def where(cond, x, y):
         join="exact",
         dataset_join="exact",
         dask="allowed",
+        keep_attrs=True,
     )
+
+    if hasattr(result, "attrs"):
+        for obj in (cond, x, y):
+            if hasattr(obj, "attrs") and obj.attrs:
+                result.attrs = obj.attrs.copy()
+                break
+
+    return result
 
 
 def polyval(coord, coeffs, degree_dim="degree"):

@@ -1809,6 +1809,10 @@ def where(cond, x, y):
         equivalent methods
     """
     # alignment for three arguments is complicated, so don't support it yet
+
+    def keep_attrs(attrs, context):
+        return next((attr for attr in attrs if attr), {})
+
     return apply_ufunc(
         duck_array_ops.where,
         cond,
@@ -1817,7 +1821,7 @@ def where(cond, x, y):
         join="exact",
         dataset_join="exact",
         dask="allowed",
-        keep_attrs=True,
+        keep_attrs=keep_attrs,
     )
 
 
